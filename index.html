@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHARKY | Boxy Shark HUD</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main id="cockpit" class="theme-ocean engine-off" aria-label="Vehicle HUD">
+
+    <!-- PENGATURAN HUD & MUSIC PLAYER (SISTEM ) -->
+    <div id="settingsMenu">
+      <div class="settings-heading">
+        <span class="settings-dot"></span>
+        <span>SHARKY CONFIG</span>
+        <button id="closeSettings" class="icon-button" type="button" aria-label="Tutup pengaturan">×</button>
+      </div>
+
+      <div class="menu-btns">
+        <button type="button" data-act="resize">Resize</button>
+        <button type="button" data-act="move">Pindah</button>
+        <button type="button" data-act="reset">Reset</button>
+        <button type="button" data-act="theme">Theme</button>
+      </div>
+
+      <!-- PEMUTAR MUSIK YOUTUBE  -->
+      <section id="music-panel" class="music-panel no-drag" aria-label="Online Music Player">
+        <div class="music-now-playing">
+          <div class="music-video-wrap">
+            <div id="youtube-player"></div>
+            <img id="music-cover" class="music-cover" alt="" aria-hidden="true">
+            <div id="music-player-placeholder" class="music-placeholder">
+              <span class="music-placeholder-note" aria-label="Music">♪</span>
+            </div>
+          </div>
+          <div class="music-track-meta">
+            <div id="music-track-title">Belum ada lagu</div>
+            <div id="music-track-subtitle">Online playback</div>
+          </div>
+        </div>
+
+        <div class="music-progress-row">
+          <span id="music-current-time">0:00</span>
+          <input id="music-progress" class="music-range" type="range" min="0" max="1000" value="0" step="1" aria-label="Song progress">
+          <span id="music-duration">0:00</span>
+        </div>
+
+        <div class="music-main-controls">
+          <button id="btn-music-prev" class="music-control-btn" type="button" title="Previous">⏮</button>
+          <button id="btn-music-play" class="music-play-btn" type="button" title="Play / Pause">▶</button>
+          <button id="btn-music-next" class="music-control-btn" type="button" title="Next">⏭</button>
+        </div>
+
+        <div class="music-volume-row">
+          <button id="btn-music-mute" class="music-icon-btn" type="button" title="Mute">🔊</button>
+          <input id="music-volume" class="music-range" type="range" min="0" max="100" value="80" step="1" aria-label="Volume">
+          <button id="btn-music-add-toggle" class="music-small-btn music-add-toggle" type="button" title="Tambah lagu">＋</button>
+        </div>
+
+        <div id="music-add-row" class="music-add-row hide">
+          <input id="music-url-input" type="text" placeholder="Link YouTube / ID Video" autocomplete="off">
+          <input id="music-title-input" type="text" placeholder="Nama lagu (opsional)" autocomplete="off">
+          <button id="btn-music-add" class="music-small-btn music-add-primary" type="button">▶</button>
+        </div>
+
+        <div class="music-tools-row">
+          <button id="btn-music-repeat" class="music-tool-btn" type="button" title="Ulangi lagu">↻</button>
+          <button id="btn-music-shuffle" class="music-tool-btn" type="button" title="Putar acak">⤨</button>
+        </div>
+
+        <div class="music-playlist-head">
+          <span>Playlist</span>
+          <button id="btn-music-clear" class="music-text-btn" type="button" title="Kosongkan playlist">×</button>
+        </div>
+        <div id="music-playlist" class="music-playlist" role="list">
+          <div class="music-empty">Playlist kosong. Tekan + untuk menambah lagu.</div>
+        </div>
+      </section>
+
+      <div id="settingsHint">Klik kanan untuk menutup menu</div>
+      <div class="settings-footer">
+        <span>SHARKY OS</span>
+        <span>BUILD 05.26</span>
+      </div>
+    </div>
+
+    <!-- KEPALA HIU KOTAK (BODI = KEPALA) -->
+    <div class="head">
+      <svg class="fin" viewBox="0 0 80 46" aria-hidden="true"><path d="M6 43 C20 36 30 14 44 3 C48 20 62 34 74 43 Z" fill="#fff" stroke="#0b1630" stroke-width="5" stroke-linejoin="round"/></svg>
+
+      <!-- Sirip samping = sein -->
+      <div id="leftIndicator" class="ear left" title="Sein kiri">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path class="fin-shape" d="M6 58 C8 30 24 10 56 4 C54 30 40 50 6 58 Z"/>
+          <path class="arrow" d="M31 22 L15 34 L31 46 L31 39 L43 39 L43 29 L31 29 Z"/>
+        </svg>
+      </div>
+      <div id="rightIndicator" class="ear right" title="Sein kanan">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path class="fin-shape" d="M6 58 C8 30 24 10 56 4 C54 30 40 50 6 58 Z"/>
+          <path class="arrow" d="M31 22 L15 34 L31 46 L31 39 L43 39 L43 29 L31 29 Z"/>
+        </svg>
+      </div>
+      <div class="bandage" aria-hidden="true"></div>
+
+      <!-- Dahi: mata -->
+      <div class="eyes">
+        <div class="eye-wrap"><div class="eye"><span class="pupil"></span><span class="lid"></span></div><span class="tear"></span></div>
+        <div class="eye-wrap"><div class="eye"><span class="pupil"></span><span class="lid"></span></div><span class="tear"></span></div>
+      </div>
+
+      <!-- Bar atas mulut -->
+      <div class="sub-bar">
+        <span class="hp">❤ <b id="healthValue">100%</b></span>
+        <div class="status-icons">
+          <div id="engineCheck" class="vehicle-indicator" title="Engine Check">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l2-3h6l2 3h3v9h-3l-2 2H8l-2-2H4zM9 6V3h5v3M8 12h3m2 0h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+          </div>
+          <div id="headlightIndicator" class="vehicle-indicator" title="Headlights">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h5a5 5 0 0 1 0 10H4zM13 8h7M13 12h8M13 16h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div id="seatbeltIndicator" class="vehicle-indicator" title="Seatbelt">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3l4 3-2 4 6 7 3-2 2 3-4 3-9-10 1-4-3-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <span id="gearValue" class="gear-badge" title="Gear">N</span>
+      </div>
+
+      <!-- Mulut kotak menganga = layar telemetri -->
+      <div class="mouth">
+        <div id="teethTop" class="teeth"></div>
+        <div class="screen">
+          <div class="speed-wrap">
+            <div id="speedValue">000</div>
+            <span id="speedUnit">KM/H</span>
+          </div>
+          <svg class="tongue" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+            <path id="tonguePath" d="M0 40 L0 34 L200 34 L200 40 Z" fill="#ff7fa8" stroke="#d94c7e" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div id="teethBottom" class="teeth"></div>
+      </div>
+
+      <!-- Dagu: fuel, nama, odometer, RPM -->
+      <div class="chin">
+        <div class="chin-row">
+          <span class="fuel">⛽ <b id="fuelValue">100%</b></span>
+          <span class="name">SHARKY</span>
+          <span class="odo"><b id="odometerValue">0.0</b> KM</span>
+        </div>
+        <div class="rpm-track" title="RPM">
+          <div id="rpmFill"></div>
+          <div class="rpm-red"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="alarmBanner" role="status" aria-live="polite">
+      <span class="alarm-symbol">!</span>
+      <span>OVERSPEED DETECTED</span>
+      <span class="alarm-speed">LIMIT 60</span>
+    </div>
+  </main>
+
+  <audio id="speedAlarmAudio" src="speedlimit.mp3" preload="auto" loop></audio>
+  <script src="script.js"></script>
+</body>
+</html>
