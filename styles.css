@@ -1,15 +1,14 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Background di luar kepala transparan total */
 html, body {
   width: 100%; height: 100%; overflow: hidden;
   background: transparent !important;
   font-family: "Rajdhani", sans-serif;
   user-select: none; -webkit-user-select: none;
 }
-button, input { font: inherit; }
+button, input, select { font: inherit; }
 
-/* ===== COCKPIT & TEMA (kontrol --tx --ty --scale dipertahankan) ===== */
+/* ===== COCKPIT & TEMA ===== */
 #cockpit {
   --ink: #0b1630;
   --body: #3b8fd9; --body-dark: #1f5fa8; --belly: #cfe9ff;
@@ -31,7 +30,148 @@ button, input { font: inherit; }
 #cockpit.mode-move { cursor: move; }
 #cockpit.mode-resize { cursor: ns-resize; }
 
-/* ===== MENU SETTING & MUSIC PLAYER (tetap melayang di atas kepala) ===== */
+/* ===== FLOATING MINI AUDIO PILL (MELAYANG DI ATAS KEPALA SHARKY) ===== */
+.mini-music-pill {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  bottom: calc(100% + 6px);
+  height: 34px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(11, 22, 48, 0.94);
+  border: 2px solid var(--hud);
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(var(--hud-rgb), 0.35);
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.96);
+  visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+  z-index: 9995;
+}
+
+.mini-music-pill.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+#settingsMenu.open ~ #mini-music-pill {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.95);
+}
+
+.mini-pill-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mini-source-badge {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font: 700 8.5px "Orbitron", sans-serif;
+  letter-spacing: 0.4px;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--hud);
+  border: 1px solid rgba(var(--hud-rgb), 0.4);
+}
+
+.mini-source-badge.yt-mode {
+  background: rgba(255, 59, 59, 0.2);
+  border-color: rgba(255, 92, 92, 0.45);
+  color: #ffd6d6;
+}
+
+.mini-source-badge.radio-mode {
+  background: rgba(63, 217, 160, 0.2);
+  border-color: rgba(63, 217, 160, 0.45);
+  color: #c6ffe9;
+}
+
+.mini-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  width: 13px;
+}
+
+.mini-eq span {
+  width: 2.5px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--hud);
+  opacity: 0.4;
+  transition: height 0.15s ease, opacity 0.15s ease;
+}
+
+.mini-music-pill.playing .mini-eq span {
+  opacity: 1;
+  animation: eqBounceMini 0.5s ease-in-out infinite alternate;
+}
+.mini-music-pill.playing .mini-eq span:nth-child(2) { animation-delay: 0.15s; }
+.mini-music-pill.playing .mini-eq span:nth-child(3) { animation-delay: 0.3s; }
+
+.mini-track-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mini-track-title {
+  font: 700 10.5px "Orbitron", sans-serif;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-pill-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.mini-ctrl-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 10px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+}
+
+.mini-ctrl-btn:hover {
+  background: var(--hud);
+  color: #0b1630;
+  transform: scale(1.08);
+}
+
+.mini-play-toggle {
+  background: var(--hud);
+  color: #0b1630;
+  font-weight: 800;
+}
+
+.mini-close-btn { font-size: 13px; opacity: 0.75; }
+.mini-close-btn:hover { background: rgba(255, 59, 59, 0.4); color: #fff; opacity: 1; }
+
+/* ===== MENU SETTING ===== */
 #settingsMenu {
   position: absolute;
   left: 0;
@@ -108,7 +248,7 @@ button, input { font: inherit; }
   color: #001018;
 }
 
-/* ===== MUSIC PLAYER EMBEDDED (GAYA SAMC) ===== */
+/* ===== DUAL-MODE MUSIC PANEL (RADIO & YOUTUBE) ===== */
 .music-panel {
   margin-top: 10px;
   padding: 8px;
@@ -117,270 +257,220 @@ button, input { font: inherit; }
   background: rgba(var(--hud-rgb), 0.05);
 }
 
-.music-now-playing {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.music-video-wrap {
-  position: relative;
-  width: 90px;
-  height: 52px;
-  flex: 0 0 90px;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #080a0e;
-  border: 1px solid rgba(var(--hud-rgb), 0.25);
-}
-
-/* Iframe disembunyikan agar audio jalan tanpa layar hitam di FiveM */
-.music-video-wrap iframe {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 1px !important;
-  height: 1px !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.music-cover {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  object-fit: cover;
-}
-
-.music-cover.show { display: block; }
-
-.music-placeholder {
-  position: absolute;
-  inset: 0;
+.audio-tabs {
   display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.6);
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 6px;
+  margin-bottom: 8px;
 }
 
-.music-placeholder.hide { display: none; }
-.music-placeholder-note { font-size: 22px; }
-
-.music-track-meta { min-width: 0; flex: 1; }
-
-#music-track-title {
+.audio-tab {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(var(--hud-rgb), 0.7);
   font: 700 10px "Orbitron", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.audio-tab.active {
+  background: var(--hud);
+  color: #001018;
+}
+
+.audio-tab-pane { display: none; }
+.audio-tab-pane.active { display: block; }
+
+/* Radio UI */
+.radio-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(var(--hud-rgb), 0.2);
+  border-radius: 6px;
+}
+
+.radio-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(63, 217, 160, 0.2);
+  border: 1px solid rgba(63, 217, 160, 0.4);
+  color: #7dffc4;
+  font: 800 8px "Orbitron", sans-serif;
+}
+
+.radio-meta { flex: 1; min-width: 0; }
+.radio-station-name {
+  font: 700 10.5px "Orbitron", sans-serif;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-#music-track-subtitle {
-  margin-top: 2px;
-  font-size: 8px;
-  color: rgba(var(--hud-rgb), 0.65);
+.radio-status-text {
+  font-size: 8.5px;
+  color: rgba(var(--hud-rgb), 0.7);
+  margin-top: 1px;
 }
+
+.radio-eq { display: flex; align-items: flex-end; gap: 2px; height: 13px; }
+.radio-eq span { width: 2.5px; height: 3px; background: var(--hud); border-radius: 1px; opacity: 0.35; }
+#cockpit.radio-active .radio-eq span { opacity: 1; animation: eqBounce 0.55s ease-in-out infinite alternate; }
+#cockpit.radio-active .radio-eq span:nth-child(2) { animation-delay: 0.15s; }
+#cockpit.radio-active .radio-eq span:nth-child(3) { animation-delay: 0.3s; }
+#cockpit.radio-active .radio-eq span:nth-child(4) { animation-delay: 0.45s; }
+
+.radio-select-wrap { margin-top: 6px; }
+.radio-select {
+  width: 100%;
+  padding: 5px 6px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(var(--hud-rgb), 0.3);
+  color: #fff;
+  font: 600 10px "Orbitron", sans-serif;
+  outline: none;
+  cursor: pointer;
+}
+.radio-select option { background: #080e1a; color: #fff; }
+
+.volume-pct {
+  font: 700 9px "Orbitron", sans-serif;
+  min-width: 28px;
+  text-align: right;
+  color: var(--hud);
+}
+
+.radio-track-badge {
+  padding: 1px 5px;
+  border-radius: 3px;
+  font: 800 7.5px "Orbitron", sans-serif;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+.radio-track-badge.custom {
+  background: rgba(63, 217, 160, 0.2);
+  border: 1px solid rgba(63, 217, 160, 0.4);
+  color: #7dffc4;
+}
+
+.track-del-btn {
+  margin-left: 4px;
+  width: 15px; height: 15px;
+  border-radius: 3px;
+  background: rgba(255, 59, 59, 0.2);
+  color: #ff8080;
+  font-size: 11px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.track-del-btn:hover { background: rgba(255, 59, 59, 0.75); color: #fff; }
+
+/* YouTube UI */
+.music-now-playing { display: flex; gap: 10px; align-items: center; }
+.music-video-wrap {
+  position: relative;
+  width: 90px; height: 52px; flex: 0 0 90px;
+  border-radius: 6px; overflow: hidden;
+  background: #080a0e;
+  border: 1px solid rgba(var(--hud-rgb), 0.25);
+}
+.music-video-wrap iframe {
+  position: absolute !important; left: 0 !important; top: 0 !important;
+  width: 1px !important; height: 1px !important;
+  opacity: 0 !important; pointer-events: none !important;
+}
+.music-cover { position: absolute; inset: 0; width: 100%; height: 100%; display: none; object-fit: cover; }
+.music-cover.show { display: block; }
+.music-placeholder { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.6); }
+.music-placeholder.hide { display: none; }
+.music-placeholder-note { font-size: 22px; }
+
+.music-track-meta { min-width: 0; flex: 1; }
+#music-track-title {
+  font: 700 10px "Orbitron", sans-serif;
+  color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#music-track-subtitle { margin-top: 2px; font-size: 8px; color: rgba(var(--hud-rgb), 0.65); }
 
 .music-progress-row {
-  display: grid;
-  grid-template-columns: 28px 1fr 28px;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 8px;
-  color: var(--hud);
+  display: grid; grid-template-columns: 28px 1fr 28px;
+  align-items: center; gap: 6px; margin-top: 6px; font-size: 8px; color: var(--hud);
 }
+.music-range { width: 100%; accent-color: var(--hud); cursor: pointer; height: 8px; }
 
-.music-range {
-  width: 100%;
-  accent-color: var(--hud);
-  cursor: pointer;
-  height: 8px;
-}
-
-.music-main-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 6px 0 4px;
-}
-
-.music-control-btn {
-  background: transparent;
-  border: 0;
-  color: var(--hud);
-  font-size: 14px;
-  cursor: pointer;
-}
-
+.music-main-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 6px 0 4px; }
+.music-control-btn { background: transparent; border: 0; color: var(--hud); font-size: 14px; cursor: pointer; }
 .music-play-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--hud);
-  color: #05101a;
-  border: 0;
-  font-size: 11px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--hud); color: #05101a;
+  border: 0; font-size: 11px; cursor: pointer;
+  display: grid; place-items: center; font-weight: 700;
 }
 
-.music-volume-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.music-icon-btn {
-  background: transparent;
-  border: 0;
-  color: var(--hud);
-  cursor: pointer;
-  font-size: 13px;
-}
-
+.music-volume-row { display: flex; align-items: center; gap: 6px; }
+.music-icon-btn { background: transparent; border: 0; color: var(--hud); cursor: pointer; font-size: 13px; }
 .music-small-btn {
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: rgba(var(--hud-rgb), 0.15);
-  border: 1px solid var(--hud);
-  color: var(--hud);
-  font: 700 10px "Orbitron", sans-serif;
-  cursor: pointer;
+  padding: 2px 7px; border-radius: 4px;
+  background: rgba(var(--hud-rgb), 0.15); border: 1px solid var(--hud);
+  color: var(--hud); font: 700 10px "Orbitron", sans-serif; cursor: pointer;
 }
 
-.music-add-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 4px;
-  margin-top: 6px;
-}
-
+.music-add-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 4px; margin-top: 6px; }
 .music-add-row.hide { display: none !important; }
-
 .music-add-row input {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(var(--hud-rgb), 0.4);
-  border-radius: 4px;
-  color: #fff;
-  padding: 4px 6px;
-  font-size: 9px;
-  outline: none;
+  background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(var(--hud-rgb), 0.4);
+  border-radius: 4px; color: #fff; padding: 4px 6px; font-size: 9px; outline: none;
 }
+.music-add-primary { background: var(--hud); color: #05101a; }
 
-.music-add-primary {
-  background: var(--hud);
-  color: #05101a;
-}
-
-.music-tools-row {
-  display: flex;
-  gap: 6px;
-  margin-top: 6px;
-}
-
+.music-tools-row { display: flex; gap: 6px; margin-top: 6px; }
 .music-tool-btn {
-  flex: 1;
-  height: 24px;
-  background: rgba(var(--hud-rgb), 0.1);
-  border: 1px solid var(--hud);
-  border-radius: 4px;
-  color: var(--hud);
-  font-size: 11px;
-  cursor: pointer;
+  flex: 1; height: 24px;
+  background: rgba(var(--hud-rgb), 0.1); border: 1px solid var(--hud);
+  border-radius: 4px; color: var(--hud); font-size: 11px; cursor: pointer;
 }
-
-.music-tool-btn.active {
-  background: var(--hud);
-  color: #05101a;
-}
+.music-tool-btn.active { background: var(--hud); color: #05101a; }
 
 .music-playlist-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(var(--hud-rgb), 0.2);
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(var(--hud-rgb), 0.2);
   font: 700 8px "Orbitron", sans-serif;
 }
-
-.music-text-btn {
-  background: transparent;
-  border: 0;
-  color: var(--hud);
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.music-playlist {
-  max-height: 70px;
-  overflow-y: auto;
-  margin-top: 4px;
-}
-
-.music-empty {
-  padding: 6px;
-  text-align: center;
-  font-size: 8px;
-  opacity: 0.5;
-}
+.music-text-btn { background: transparent; border: 0; color: var(--hud); cursor: pointer; font-size: 12px; }
+.music-playlist { max-height: 70px; overflow-y: auto; margin-top: 4px; }
+.music-empty { padding: 6px; text-align: center; font-size: 8px; opacity: 0.5; }
 
 .music-track-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 4px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  text-align: left;
+  width: 100%; display: flex; align-items: center; gap: 6px;
+  padding: 3px 4px; border: 0; border-radius: 4px; background: transparent;
+  color: #fff; cursor: pointer; text-align: left;
 }
-
-.music-track-row:hover,
-.music-track-row.active {
-  background: rgba(var(--hud-rgb), 0.15);
-}
-
-.music-track-thumb {
-  width: 28px;
-  height: 16px;
-  flex: 0 0 28px;
-  border-radius: 3px;
-  overflow: hidden;
-  background: #000;
-}
-
+.music-track-row:hover, .music-track-row.active { background: rgba(var(--hud-rgb), 0.15); }
+.music-track-thumb { width: 28px; height: 16px; flex: 0 0 28px; border-radius: 3px; overflow: hidden; background: #000; }
 .music-track-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .music-track-copy { min-width: 0; flex: 1; }
 .music-track-copy strong { display: block; font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .music-track-index { font-size: 7px; opacity: 0.5; }
 
 #settingsHint {
-  margin-top: 9px;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: center;
-  color: var(--hud);
-  letter-spacing: 0.4px;
+  margin-top: 9px; font-size: 11px; font-weight: 600; text-align: center;
+  color: var(--hud); letter-spacing: 0.4px;
 }
-
 .settings-footer {
-  display: flex;
-  justify-content: space-between;
-  font: 600 8px "Orbitron", sans-serif;
-  opacity: 0.45;
-  border-top: 1px solid rgba(var(--hud-rgb), 0.2);
-  padding-top: 6px;
-  margin-top: 6px;
+  display: flex; justify-content: space-between; font: 600 8px "Orbitron", sans-serif;
+  opacity: 0.45; border-top: 1px solid rgba(var(--hud-rgb), 0.2);
+  padding-top: 6px; margin-top: 6px;
 }
 
 /* ===== KEPALA HIU KOTAK ===== */
@@ -393,10 +483,11 @@ button, input { font: inherit; }
   border-radius: 72px;
   box-shadow: 0 8px 0 rgba(0,0,0,.25), inset 0 -18px 0 rgba(0,0,0,.12), inset 0 10px 0 rgba(255,255,255,.14);
   animation: breathe 3.2s ease-in-out infinite;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .fin { position: absolute; top: -38px; left: 50%; width: 70px; margin-left: -35px; }
 
-/* Sirip samping = sein */
+/* Sirip sein */
 .ear { position: absolute; top: 26px; width: 62px; height: 62px; z-index: 3; }
 .ear.left { left: -46px; }
 .ear.right { right: -46px; transform: scaleX(-1); }
@@ -454,11 +545,21 @@ button, input { font: inherit; }
   background: rgba(11,22,48,.55); border: 3px solid var(--ink); border-radius: 18px;
 }
 .hp b { font: inherit; }
-.status-icons { display: flex; gap: 10px; }
-.vehicle-indicator { width: 22px; height: 22px; display: grid; place-items: center; color: #fff; opacity: .35; transition: opacity .2s, color .2s; }
+.status-icons { display: flex; gap: 8px; }
+.vehicle-indicator { width: 22px; height: 22px; display: grid; place-items: center; color: #fff; opacity: .35; transition: opacity .2s, color .2s, transform .2s, filter .2s; }
 .vehicle-indicator svg { width: 100%; height: 100%; }
 .vehicle-indicator.active { opacity: 1; color: #ffe066; }
-#headlightIndicator.active { color: #fff7a8; }
+
+/* Status Lampu (Low/High Beam) */
+#headlightIndicator.low-beam { opacity: 1; color: #52f78b; filter: drop-shadow(0 0 6px #52f78b); }
+#headlightIndicator.high-beam { opacity: 1; color: #38b6ff; filter: drop-shadow(0 0 8px #38b6ff); }
+
+/* Status Door Lock */
+#doorLockIcon.unlocked { opacity: 0.35; color: #fff; }
+#doorLockIcon.locked { opacity: 1; color: #35f277; filter: drop-shadow(0 0 6px #35f277); }
+#doorLockIcon.lock-snap { animation: lockSnap 0.34s cubic-bezier(0.34, 1.56, 0.64, 1); }
+#lockShackle { transition: d 0.2s ease; }
+
 .vehicle-indicator.danger { color: #ff3326 !important; opacity: 1 !important; animation: dangerPulse .9s infinite alternate; }
 .gear-badge {
   min-width: 30px; padding: 2px 8px; text-align: center;
@@ -483,10 +584,28 @@ button, input { font: inherit; }
 
 .screen { position: relative; height: 120px; display: flex; align-items: center; justify-content: center; padding-bottom: 30px; }
 .speed-wrap { position: relative; z-index: 2; display: flex; align-items: baseline; gap: 8px; color: #fff; text-shadow: 0 0 14px rgba(var(--hud-rgb), .8); }
-#speedValue { min-width: 3ch; text-align: right; font: 900 74px/1 "Orbitron", sans-serif; letter-spacing: 2px; }
-#speedUnit { font: 700 16px "Orbitron", sans-serif; color: var(--hud); }
+#speedValue { min-width: 3ch; text-align: right; font: 900 74px/1 "Orbitron", sans-serif; letter-spacing: 2px; transition: color 0.2s, text-shadow 0.2s; }
+#speedUnit { font: 700 16px "Orbitron", sans-serif; color: var(--hud); text-transform: uppercase; }
 .overspeed #speedValue { color: #ff5a6e; }
 .tongue { position: absolute; left: 0; bottom: 0; width: 100%; height: 40px; z-index: 1; }
+
+/* Notifikasi internal dalam mulut */
+.hud-notice {
+  position: absolute; left: 50%; top: 50%; z-index: 10;
+  max-width: calc(100% - 24px); padding: 5px 12px;
+  border-radius: 8px; background: rgba(11, 18, 36, 0.92);
+  border: 2px solid #ff9f2e; color: #ff9f2e;
+  font: 700 10.5px "Orbitron", sans-serif; text-align: center;
+  pointer-events: none; opacity: 0;
+  transform: translate(-50%, -50%) scale(0.92);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.hud-notice.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+/* Night Mode Lume */
+#cockpit.night-mode #speedValue {
+  text-shadow: 0 0 20px rgba(var(--hud-rgb), 0.95), 0 0 35px rgba(var(--hud-rgb), 0.45);
+}
 
 /* Dagu */
 .chin { background: var(--belly); color: var(--ink); border: 4px solid var(--ink); border-radius: 26px; padding: 8px 14px 10px; }
@@ -494,12 +613,15 @@ button, input { font: inherit; }
 .fuel { justify-self: start; }
 .fuel b, .odo b { font: inherit; }
 .fuel-critical .fuel { color: #e0102f; animation: dangerPulse .6s infinite alternate; }
-.name { font: 900 17px "Orbitron", sans-serif; letter-spacing: 3px; }
+.name { font: 900 17px "Orbitron", sans-serif; letter-spacing: 3px; transition: transform 0.2s; }
 .odo { justify-self: end; font-size: 11px; }
 .rpm-track { position: relative; height: 14px; margin-top: 7px; background: #fff; border: 3px solid var(--ink); border-radius: 9px; overflow: hidden; }
 #rpmFill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--body), var(--hud)); transition: width .12s linear; }
 .redline #rpmFill { background: #ff3b2f; }
 .rpm-red { position: absolute; right: 0; top: 0; bottom: 0; width: 15%; background: repeating-linear-gradient(45deg, rgba(255,56,91,.75) 0 4px, rgba(255,56,91,.35) 4px 8px); }
+
+/* Efek Musik Berdenyut Halus */
+#cockpit.music-playing .name { animation: nameBeat 1.2s ease-in-out infinite; }
 
 /* Alarm overspeed */
 #alarmBanner {
@@ -528,3 +650,7 @@ button, input { font: inherit; }
 @keyframes mouthTremble { from { transform: translate(-1px, 1px); } to { transform: translate(1px, -1px); } }
 @keyframes dangerPulse { from { opacity: 1; } to { opacity: .35; } }
 @keyframes dangerBlink { from { opacity: 1; } to { opacity: .55; } }
+@keyframes eqBounce { 0% { height: 3px; } 100% { height: 12px; } }
+@keyframes eqBounceMini { 0% { height: 3px; } 100% { height: 10px; } }
+@keyframes lockSnap { 0% { transform: scale(0.85); } 55% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes nameBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }

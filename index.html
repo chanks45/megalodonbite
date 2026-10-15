@@ -12,7 +12,29 @@
 <body>
   <main id="cockpit" class="theme-ocean engine-off" aria-label="Vehicle HUD">
 
-    <!-- PENGATURAN HUD & MUSIC PLAYER (SISTEM ) -->
+    <!-- FLOATING MINI AUDIO CONTROLLER DI ATAS KEPALA SHARKY -->
+    <div id="mini-music-pill" class="mini-music-pill no-drag" aria-label="Mini Audio Controller">
+      <div class="mini-pill-left">
+        <span id="miniSourceBadge" class="mini-source-badge">📻 RADIO</span>
+        <div id="miniEq" class="mini-eq" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="mini-track-wrap" title="Sedang Diputar">
+        <div id="miniTrackTitle" class="mini-track-title">Delta FM</div>
+      </div>
+
+      <div class="mini-pill-controls">
+        <button id="btn-mini-prev" class="mini-ctrl-btn" type="button" title="Sebelumnya">⏮</button>
+        <button id="btn-mini-play" class="mini-ctrl-btn mini-play-toggle" type="button" title="Play / Pause">▶</button>
+        <button id="btn-mini-next" class="mini-ctrl-btn" type="button" title="Berikutnya">⏭</button>
+        <button id="btn-mini-open" class="mini-ctrl-btn mini-panel-btn" type="button" title="Buka Panel Musik">🎵</button>
+        <button id="btn-mini-close" class="mini-ctrl-btn mini-close-btn" type="button" title="Sembunyikan Mini Player">×</button>
+      </div>
+    </div>
+
+    <!-- PENGATURAN HUD & DUAL-MODE AUDIO PLAYER -->
     <div id="settingsMenu">
       <div class="settings-heading">
         <span class="settings-dot"></span>
@@ -27,57 +49,115 @@
         <button type="button" data-act="theme">Theme</button>
       </div>
 
-      <!-- PEMUTAR MUSIK YOUTUBE  -->
-      <section id="music-panel" class="music-panel no-drag" aria-label="Online Music Player">
-        <div class="music-now-playing">
-          <div class="music-video-wrap">
-            <div id="youtube-player"></div>
-            <img id="music-cover" class="music-cover" alt="" aria-hidden="true">
-            <div id="music-player-placeholder" class="music-placeholder">
-              <span class="music-placeholder-note" aria-label="Music">♪</span>
+      <!-- PANEL DUAL-MODE AUDIO (RADIO FM & YOUTUBE) -->
+      <section id="music-panel" class="music-panel no-drag" aria-label="Dual Mode Audio Player">
+        <!-- Tab Navigasi Audio -->
+        <div class="audio-tabs" role="tablist">
+          <button id="tabBtnRadio" class="audio-tab active" type="button" data-tab="radio" role="tab" aria-selected="true">
+            📻 Radio FM
+          </button>
+          <button id="tabBtnYoutube" class="audio-tab" type="button" data-tab="youtube" role="tab" aria-selected="false">
+            ▶ YouTube
+          </button>
+        </div>
+
+        <!-- TAB 1: LIVE RADIO FM STREAMING -->
+        <div id="tabContentRadio" class="audio-tab-pane active" role="tabpanel">
+          <div class="radio-display">
+            <div class="radio-badge">LIVE FM</div>
+            <div class="radio-meta">
+              <div id="stationName" class="radio-station-name">Delta FM</div>
+              <div id="radioStatus" class="radio-status-text">Stopped</div>
+            </div>
+            <div class="radio-eq" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
             </div>
           </div>
-          <div class="music-track-meta">
-            <div id="music-track-title">Belum ada lagu</div>
-            <div id="music-track-subtitle">Online playback</div>
+
+          <div class="radio-select-wrap">
+            <select id="stationSelect" class="radio-select" aria-label="Pilih Stasiun Radio"></select>
           </div>
+
+          <div class="music-main-controls">
+            <button id="btn-radio-prev" class="music-control-btn" type="button" title="Stasiun Sebelumnya">⏮</button>
+            <button id="btn-radio-play" class="music-play-btn" type="button" title="Play / Pause Radio">▶</button>
+            <button id="btn-radio-next" class="music-control-btn" type="button" title="Stasiun Berikutnya">⏭</button>
+          </div>
+
+          <div class="music-volume-row">
+            <button id="btn-radio-mute" class="music-icon-btn" type="button" title="Mute Radio">🔊</button>
+            <input id="radio-volume" class="music-range" type="range" min="0" max="100" value="80" step="1" aria-label="Radio Volume">
+            <span id="radio-volume-label" class="volume-pct">80%</span>
+            <button id="btn-radio-add-toggle" class="music-small-btn music-add-toggle" type="button" title="Tambah saluran radio via link">＋</button>
+          </div>
+
+          <!-- Form Tambah Saluran Radio Kustom -->
+          <div id="radio-add-row" class="music-add-row hide">
+            <input id="radio-url-input" type="text" placeholder="Link Stream Radio (http/https)" autocomplete="off">
+            <input id="radio-title-input" type="text" placeholder="Nama Radio (opsional)" autocomplete="off">
+            <button id="btn-radio-add" class="music-small-btn music-add-primary" type="button" title="Simpan & Putar">▶</button>
+          </div>
+
+          <!-- Daftar Playlist Radio -->
+          <div class="music-playlist-head">
+            <span>Saluran Radio</span>
+            <button id="btn-radio-clear" class="music-text-btn" type="button" title="Hapus semua radio tambahan">↺</button>
+          </div>
+          <div id="radio-playlist" class="music-playlist" role="list"></div>
         </div>
 
-        <div class="music-progress-row">
-          <span id="music-current-time">0:00</span>
-          <input id="music-progress" class="music-range" type="range" min="0" max="1000" value="0" step="1" aria-label="Song progress">
-          <span id="music-duration">0:00</span>
-        </div>
+        <!-- TAB 2: YOUTUBE LINK & PLAYLIST -->
+        <div id="tabContentYoutube" class="audio-tab-pane" role="tabpanel">
+          <div class="music-now-playing">
+            <div class="music-video-wrap">
+              <div id="youtube-player"></div>
+              <img id="music-cover" class="music-cover" alt="" aria-hidden="true">
+              <div id="music-player-placeholder" class="music-placeholder">
+                <span class="music-placeholder-note" aria-label="Music">♪</span>
+              </div>
+            </div>
+            <div class="music-track-meta">
+              <div id="music-track-title">Belum ada lagu</div>
+              <div id="music-track-subtitle">Online playback</div>
+            </div>
+          </div>
 
-        <div class="music-main-controls">
-          <button id="btn-music-prev" class="music-control-btn" type="button" title="Previous">⏮</button>
-          <button id="btn-music-play" class="music-play-btn" type="button" title="Play / Pause">▶</button>
-          <button id="btn-music-next" class="music-control-btn" type="button" title="Next">⏭</button>
-        </div>
+          <div class="music-progress-row">
+            <span id="music-current-time">0:00</span>
+            <input id="music-progress" class="music-range" type="range" min="0" max="1000" value="0" step="1" aria-label="Song progress">
+            <span id="music-duration">0:00</span>
+          </div>
 
-        <div class="music-volume-row">
-          <button id="btn-music-mute" class="music-icon-btn" type="button" title="Mute">🔊</button>
-          <input id="music-volume" class="music-range" type="range" min="0" max="100" value="80" step="1" aria-label="Volume">
-          <button id="btn-music-add-toggle" class="music-small-btn music-add-toggle" type="button" title="Tambah lagu">＋</button>
-        </div>
+          <div class="music-main-controls">
+            <button id="btn-music-prev" class="music-control-btn" type="button" title="Previous">⏮</button>
+            <button id="btn-music-play" class="music-play-btn" type="button" title="Play / Pause">▶</button>
+            <button id="btn-music-next" class="music-control-btn" type="button" title="Next">⏭</button>
+          </div>
 
-        <div id="music-add-row" class="music-add-row hide">
-          <input id="music-url-input" type="text" placeholder="Link YouTube / ID Video" autocomplete="off">
-          <input id="music-title-input" type="text" placeholder="Nama lagu (opsional)" autocomplete="off">
-          <button id="btn-music-add" class="music-small-btn music-add-primary" type="button">▶</button>
-        </div>
+          <div class="music-volume-row">
+            <button id="btn-music-mute" class="music-icon-btn" type="button" title="Mute">🔊</button>
+            <input id="music-volume" class="music-range" type="range" min="0" max="100" value="80" step="1" aria-label="Volume">
+            <button id="btn-music-add-toggle" class="music-small-btn music-add-toggle" type="button" title="Tambah lagu">＋</button>
+          </div>
 
-        <div class="music-tools-row">
-          <button id="btn-music-repeat" class="music-tool-btn" type="button" title="Ulangi lagu">↻</button>
-          <button id="btn-music-shuffle" class="music-tool-btn" type="button" title="Putar acak">⤨</button>
-        </div>
+          <div id="music-add-row" class="music-add-row hide">
+            <input id="music-url-input" type="text" placeholder="Link YouTube / ID Video" autocomplete="off">
+            <input id="music-title-input" type="text" placeholder="Nama lagu (opsional)" autocomplete="off">
+            <button id="btn-music-add" class="music-small-btn music-add-primary" type="button">▶</button>
+          </div>
 
-        <div class="music-playlist-head">
-          <span>Playlist</span>
-          <button id="btn-music-clear" class="music-text-btn" type="button" title="Kosongkan playlist">×</button>
-        </div>
-        <div id="music-playlist" class="music-playlist" role="list">
-          <div class="music-empty">Playlist kosong. Tekan + untuk menambah lagu.</div>
+          <div class="music-tools-row">
+            <button id="btn-music-repeat" class="music-tool-btn" type="button" title="Ulangi lagu">↻</button>
+            <button id="btn-music-shuffle" class="music-tool-btn" type="button" title="Putar acak">⤨</button>
+          </div>
+
+          <div class="music-playlist-head">
+            <span>Playlist</span>
+            <button id="btn-music-clear" class="music-text-btn" type="button" title="Kosongkan playlist">×</button>
+          </div>
+          <div id="music-playlist" class="music-playlist" role="list">
+            <div class="music-empty">Playlist kosong. Tekan + untuk menambah lagu.</div>
+          </div>
         </div>
       </section>
 
@@ -88,7 +168,7 @@
       </div>
     </div>
 
-    <!-- KEPALA HIU KOTAK (BODI = KEPALA) -->
+    <!-- KEPALA HIU KOTAK -->
     <div class="head">
       <svg class="fin" viewBox="0 0 80 46" aria-hidden="true"><path d="M6 43 C20 36 30 14 44 3 C48 20 62 34 74 43 Z" fill="#fff" stroke="#0b1630" stroke-width="5" stroke-linejoin="round"/></svg>
 
@@ -117,14 +197,26 @@
       <div class="sub-bar">
         <span class="hp">❤ <b id="healthValue">100%</b></span>
         <div class="status-icons">
+          <!-- 1. Engine Check -->
           <div id="engineCheck" class="vehicle-indicator" title="Engine Check">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l2-3h6l2 3h3v9h-3l-2 2H8l-2-2H4zM9 6V3h5v3M8 12h3m2 0h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
           </div>
+          <!-- 2. Headlights -->
           <div id="headlightIndicator" class="vehicle-indicator" title="Headlights">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h5a5 5 0 0 1 0 10H4zM13 8h7M13 12h8M13 16h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
+          <!-- 3. Seatbelt -->
           <div id="seatbeltIndicator" class="vehicle-indicator" title="Seatbelt">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3l4 3-2 4 6 7 3-2 2 3-4 3-9-10 1-4-3-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <!-- 4. Ikon Kunci Pintu (Door Lock) -->
+          <div id="doorLockIcon" class="vehicle-indicator unlocked" title="Doors: Unlocked">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path id="lockShackle" d="M7 11V7a5 5 0 0 1 9.9-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <rect x="5" y="11" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="2" />
+              <circle cx="12" cy="15.5" r="1.3" fill="currentColor" />
+              <line x1="12" y1="16.8" x2="12" y2="18.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
           </div>
         </div>
         <span id="gearValue" class="gear-badge" title="Gear">N</span>
@@ -132,6 +224,9 @@
 
       <!-- Mulut kotak menganga = layar telemetri -->
       <div class="mouth">
+        <!-- Notifikasi Internal HUD (pengganti alert pop-up) -->
+        <div id="hudNotice" class="hud-notice" role="status" aria-live="polite"></div>
+
         <div id="teethTop" class="teeth"></div>
         <div class="screen">
           <div class="speed-wrap">
@@ -150,7 +245,7 @@
         <div class="chin-row">
           <span class="fuel">⛽ <b id="fuelValue">100%</b></span>
           <span class="name">SHARKY</span>
-          <span class="odo"><b id="odometerValue">0.0</b> KM</span>
+          <span class="odo"><b id="odometerValue">0.0</b> <span id="odoUnit">KM</span></span>
         </div>
         <div class="rpm-track" title="RPM">
           <div id="rpmFill"></div>
